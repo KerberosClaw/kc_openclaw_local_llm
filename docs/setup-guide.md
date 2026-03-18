@@ -291,6 +291,7 @@ ssh ... "sudo ufw allow 11434/tcp comment 'Ollama API' && sudo ufw allow 8080/tc
 
 執行完所有步驟後，輸出以下格式的報告：
 
+```
 === PC 安裝驗證報告 ===
 Docker:          ✅ / ❌
 NVIDIA Toolkit:  ✅ / ❌
@@ -301,6 +302,7 @@ SearXNG:         ✅ 回傳 N 筆結果 / ❌
 Ollama URL:      http://PC_IP:11434
 SearXNG URL:     http://PC_IP:8080
 ======================
+```
 PC 設定完成。請確認以上所有項目為 ✅ 後，再執行 Prompt B 設定 Mac。
 ```
 
@@ -556,6 +558,7 @@ grep -q 'api.telegram.org' /etc/hosts || echo '149.154.167.220 api.telegram.org'
 
 輸出以下格式的報告：
 
+```
 === Mac 安裝驗證報告 ===
 OpenClaw:         ✅ 版本 X.X.X / ❌
 uv:               ✅ / ❌
@@ -566,6 +569,7 @@ AGENTS.md:        ✅ 已建立 / ❌
 Ollama 連線:      ✅ http://PC_IP:11434 可達 / ❌
 Telegram DNS:     ✅ api.telegram.org 可達 / ❌（未設定）
 ========================
+```
 
 然後提示使用者：
 
