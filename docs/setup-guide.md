@@ -903,7 +903,7 @@ OpenClaw 的本地搜尋 skill，透過 exec tool 呼叫 SearXNG 實例。
 
 ```bash
 # 安裝 wrapper script（macOS Apple Silicon）
-cp scripts/searxng-search /opt/homebrew/bin/
+cp skills/searxng/scripts/searxng-search /opt/homebrew/bin/
 chmod +x /opt/homebrew/bin/searxng-search
 # 編輯 searxng-search，把 PC_LAN_IP 改成你的 PC IP
 
