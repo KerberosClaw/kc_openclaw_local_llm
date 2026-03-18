@@ -64,10 +64,12 @@ SearXNG (PC Docker) — Local search, no API key needed
 
 ## Skills
 
+This project uses skills from [kc_ai_skills](https://github.com/KerberosClaw/kc_ai_skills):
+
 | Skill | Description |
 |-------|-------------|
-| [llm-benchmark](skills/llm-benchmark/) | Automated Ollama model benchmark with CPU offload detection |
-| [searxng](skills/searxng/) | OpenClaw local search integration via SearXNG |
+| [llm-benchmark](https://github.com/KerberosClaw/kc_ai_skills/tree/main/llm-benchmark) | Automated Ollama model benchmark with CPU offload detection |
+| [searxng](https://github.com/KerberosClaw/kc_ai_skills/tree/main/searxng) | OpenClaw local search integration via SearXNG |
 
 ## Quick Start
 

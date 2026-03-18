@@ -64,10 +64,12 @@ SearXNG（PC Docker）— 本地搜尋，不需 API key
 
 ## Skills
 
+本專案使用 [kc_ai_skills](https://github.com/KerberosClaw/kc_ai_skills) 的 skills：
+
 | Skill | 說明 |
 |-------|------|
-| [llm-benchmark](skills/llm-benchmark/) | Ollama 模型自動化 benchmark，含 CPU offload 偵測 |
-| [searxng](skills/searxng/) | OpenClaw 本地搜尋整合（SearXNG） |
+| [llm-benchmark](https://github.com/KerberosClaw/kc_ai_skills/tree/main/llm-benchmark) | Ollama 模型自動化 benchmark，含 CPU offload 偵測 |
+| [searxng](https://github.com/KerberosClaw/kc_ai_skills/tree/main/searxng) | OpenClaw 本地搜尋整合（SearXNG） |
 
 ## 快速開始
 

@@ -878,7 +878,11 @@ python3 -m json.tool ~/.openclaw/openclaw.json > /dev/null && echo "JSON OK"
 
 ## 附加工具
 
-本 repo 包含兩個 Claude Code / OpenClaw skill，可直接複製使用。
+搭配使用的 skills 位於 [kc_ai_skills](https://github.com/KerberosClaw/kc_ai_skills) repo。
+
+```bash
+git clone https://github.com/KerberosClaw/kc_ai_skills.git
+```
 
 ### LLM Benchmark Skill
 
@@ -886,7 +890,7 @@ python3 -m json.tool ~/.openclaw/openclaw.json > /dev/null && echo "JSON OK"
 
 ```bash
 # 複製 benchmark script 到 PC
-scp skills/llm-benchmark/scripts/benchmark.py USER@PC_IP:/tmp/
+scp kc_ai_skills/llm-benchmark/scripts/benchmark.py USER@PC_IP:/tmp/
 
 # 在 PC 上執行（需 pip install requests）
 python3 /tmp/benchmark.py qwen3-vl:8b-instruct
@@ -894,7 +898,7 @@ python3 /tmp/benchmark.py qwen3-vl:8b-instruct
 
 或安裝為 Claude Code skill：
 ```bash
-cp -r skills/llm-benchmark ~/.claude/skills/
+cp -r kc_ai_skills/llm-benchmark ~/.claude/skills/
 ```
 
 ### SearXNG Skill
@@ -903,12 +907,12 @@ OpenClaw 的本地搜尋 skill，透過 exec tool 呼叫 SearXNG 實例。
 
 ```bash
 # 安裝 wrapper script（macOS Apple Silicon）
-cp skills/searxng/scripts/searxng-search /opt/homebrew/bin/
+cp kc_ai_skills/searxng/scripts/searxng-search /opt/homebrew/bin/
 chmod +x /opt/homebrew/bin/searxng-search
 # 編輯 searxng-search，把 PC_LAN_IP 改成你的 PC IP
 
 # 安裝 OpenClaw skill
-cp -r skills/searxng ~/.openclaw/workspace/skills/
+cp -r kc_ai_skills/searxng ~/.openclaw/workspace/skills/
 ```
 
 ---
