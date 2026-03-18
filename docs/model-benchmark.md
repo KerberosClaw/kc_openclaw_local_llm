@@ -160,7 +160,6 @@ OpenClaw 的完整 system prompt 達 **12,000+ tokens**（tool schemas + AGENTS.
 - **llama3.2-vision** — 不支援 Ollama tools API
 - **qwen3:4b** — 複合操作崩潰
 - **gpt-oss:20b** — tool calling 極不穩定
-- **vLLM**（WSL2 + 消費級 GPU）— 單人場景比 Ollama 慢 10-25 倍
 
 ---
 
