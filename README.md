@@ -1,4 +1,4 @@
-# kc_openclaw_local_llm
+# OpenClaw + Local LLM: What Actually Works
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 
