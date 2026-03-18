@@ -146,19 +146,13 @@ OpenClaw 的完整 system prompt 達 **12,000+ tokens**（tool schemas + AGENTS.
 
 ## 最終推薦
 
-### 16GB VRAM（RTX 5070 Ti / 4060 Ti 16GB / 等）
+### RTX 5070 Ti 16GB VRAM（實測環境）
 
 | 場景 | 推薦模型 | ctx | 速度 |
 |------|---------|-----|------|
 | **OpenClaw agent（首選）** | `qwen3-vl:8b-instruct` | 32768 | 131 tok/s |
 | 不需 vision 的備選 | `mistral-small3.1:24b` | 32768 | 10 tok/s |
 | 純聊天（不用 tool calling） | `llama3.1:8b` | 32768 | 143 tok/s |
-
-### 8GB VRAM
-
-| 場景 | 推薦模型 | ctx | 備註 |
-|------|---------|-----|------|
-| OpenClaw agent | `qwen3-vl:8b-instruct` | 16384 | 唯一可靠選項 |
 
 ### 不推薦
 
