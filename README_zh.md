@@ -1,18 +1,18 @@
-# OpenClaw + 本地 LLM：哪些真的能用
+# OpenClaw + 本地 LLM：到底哪些能用（以及哪些會讓你懷疑人生）
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 
 [English](README.md)
 
-使用消費級 NVIDIA GPU 在本地跑 [OpenClaw](https://openclaw.ai) + [Ollama](https://ollama.com) LLM 的完整指南與工具。包含模型比較、Benchmark 數據、自動化安裝腳本，以及實戰踩坑紀錄。
+想在自己的消費級 NVIDIA GPU 上跑 [OpenClaw](https://openclaw.ai) + [Ollama](https://ollama.com)？好志向。我們花了不合理的時間踩坑，就是為了讓你不用再踩一次。這個 repo 包含模型比較、Benchmark 數據、自動化安裝腳本，以及一份血淚交織的實戰踩坑紀錄。
 
-> 測試環境：RTX 5070 Ti 16GB · OpenClaw 2026.3.13 · Ollama 0.17.7
+> 測試環境：RTX 5070 Ti 16GB -- OpenClaw 2026.3.13 -- Ollama 0.17.7
 
 ---
 
-## 為什麼需要這個 Repo？
+## 為什麼會有這個 Repo？
 
-網路上大部分「最佳本地 LLM」文章測的是**聊天**效果，不是 **agent tool calling**。OpenClaw 的 system prompt 達 12,000+ tokens（tool schemas + workspace files），大部分小模型扛不住。我們測了 13 個模型，只有 2 個能穩定使用。
+因為網路上大部分「最佳本地 LLM」文章測的都是**聊天**效果——就是「幫我寫一首關於貓的詩」那種。沒人測 **agent tool calling**，而這偏偏是 OpenClaw 的命脈。OpenClaw 的 system prompt 達 12,000+ tokens（tool schemas + workspace files），這個長度堪稱小模型殺手。我們測了 13 個模型，只有 2 個活了下來。其他 11 個以各種令人嘆為觀止的方式陣亡。
 
 ## 模型比較表（RTX 5070 Ti 16GB）
 
@@ -28,9 +28,9 @@
 | llama3.1:8b | 4.9 GB | ❌ | ❌ | — | 只回吐文字 |
 | *另外 5 個模型* | | | | | *全部失敗* |
 
-> **關鍵發現：** AGENTS.md 的指令品質比模型大小更重要。詳見[架設教程](docs/setup-guide.md)。
+> **沒人告訴你的真相：** AGENTS.md 的指令品質比模型大小更重要。好好寫指令，8B 模型也能聽話；指令寫爛，24B 模型也會給你亂搞。詳見[架設教程](docs/setup-guide.md)，那些我們花太久才搞懂的細節。
 
-### 推理引擎：Ollama vs vLLM
+### 推理引擎：Ollama vs vLLM（又名「我們兩個都試了，你不用再試」）
 
 | 指標 | Ollama | vLLM |
 |------|--------|------|
@@ -39,7 +39,7 @@
 | WSL2 支援 | 原生 | `pin_memory` 限制，效能大打折扣 |
 | 多人併發 | 排隊處理 | PagedAttention 批次處理（vLLM 優勢場景） |
 
-> vLLM 擅長多人併發。單人 Telegram bot 場景下 Ollama 快 10-25 倍。
+> vLLM 多人併發確實厲害。但單人 Telegram bot 場景？Ollama 快 10-25 倍，而且安裝過程不會讓你想砸鍵盤。
 
 ## 架構
 
@@ -60,7 +60,7 @@ SearXNG（PC Docker）— 本地搜尋，不需 API key
 |------|------|
 | [架設教程](docs/setup-guide.md) | 完整安裝教程，含 Claude Code 自動化 prompt |
 | [模型 Benchmark](docs/model-benchmark.md) | 詳細 tok/s、TTFT、VRAM 數據 |
-| [踩坑紀錄](docs/pitfalls.md) | 24 個實戰踩坑，含根因與修法 |
+| [踩坑紀錄](docs/pitfalls.md) | 24 個用血和時間換來的實戰踩坑 |
 
 ## Skills
 
@@ -71,10 +71,10 @@ SearXNG（PC Docker）— 本地搜尋，不需 API key
 | [llm-benchmark](https://github.com/KerberosClaw/kc_ai_skills/tree/main/llm-benchmark) | Ollama 模型自動化 benchmark，含 CPU offload 偵測 |
 | [searxng](https://github.com/KerberosClaw/kc_ai_skills/tree/main/searxng) | OpenClaw 本地搜尋整合（SearXNG） |
 
-## 快速開始
+## 快速開始（給沒耐心的你）
 
-完整步驟見[架設教程](docs/setup-guide.md)。簡要流程：
+完整步驟見[架設教程](docs/setup-guide.md)。懶人版：
 
 1. **PC：** 安裝 Ollama + SearXNG + 拉 `qwen3-vl:8b-instruct`
-2. **Mac：** 安裝 OpenClaw + 設定 `openclaw.json` + 撰寫 `AGENTS.md`
-3. **測試：** 透過 Telegram 或 Web UI 測試搜尋 + tool calling
+2. **Mac：** 安裝 OpenClaw + 設定 `openclaw.json` + 撰寫 `AGENTS.md`（這步比你想的重要得多）
+3. **測試：** 透過 Telegram 或 Web UI 測試搜尋 + tool calling，然後在它真的動起來的時候鬆一口氣

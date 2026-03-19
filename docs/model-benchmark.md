@@ -1,22 +1,22 @@
-# 本地 LLM Benchmark 與模型選擇報告
+# 本地 LLM Benchmark：我們測了 13 個模型，只有 2 個撐過來
 
 > **English summary:** Comprehensive benchmark and model selection report for running OpenClaw with local Ollama LLMs on RTX 5070 Ti 16GB. 13 models tested across two dimensions: raw performance (tok/s, TTFT, VRAM across context windows 2K-32K) and OpenClaw tool calling reliability (search, single/compound light control). Also includes Ollama vs vLLM inference engine comparison. Final recommendation: qwen3-vl:8b-instruct. The document is written in Traditional Chinese.
 
-> 測試環境：RTX 5070 Ti 16GB · Ollama 0.17.7 · OpenClaw 2026.3.13
+> 測試環境：RTX 5070 Ti 16GB -- Ollama 0.17.7 -- OpenClaw 2026.3.13
 > 最後更新：2026-03-19
 
 ---
 
-## 結論（先看這裡）
+## 結論先行（因為你可能沒耐心看完）
 
 **推薦模型：`qwen3-vl:8b-instruct`**
 
 - 130 tok/s @32K ctx，VRAM 僅 6-8 GB
 - OpenClaw tool calling 全通過（搜尋、單燈、複合操作、色溫、顏色）
 - 支援 vision
-- 16GB VRAM 下 qwen3-vl 最大只有 8B（下一個是 30B，需 20GB）
+- 16GB VRAM 下 qwen3-vl 最大只有 8B（下一個是 30B，需 20GB——錢包表示拒絕）
 
-**推薦推理引擎：Ollama**（單人使用場景）
+**推薦推理引擎：Ollama**（單人使用場景，原因後面會詳述）
 
 ---
 
@@ -31,9 +31,9 @@
 
 ---
 
-## Part 1：Benchmark（純效能測試）
+## Part 1：純效能 Benchmark（先不管它能不能幹活）
 
-測試方法：OpenClaw 停止、VRAM 淨空後，用 4 道題（邏輯推理、多步推理、程式設計、程式除錯）測試各 context window 下的 tok/s。
+測試方法：OpenClaw 先乖乖停下來、VRAM 淨空後，用 4 道題（邏輯推理、多步推理、程式設計、程式除錯）測試各 context window 下的 tok/s。畢竟 benchmark 這種東西，環境不乾淨就是在自欺欺人。
 
 ### 速度總覽
 
@@ -48,11 +48,11 @@
 | phi4:14b | 9.1 GB | 77 | 77 | 77 | 77 | — |
 | mistral-small3.1:24b | 15 GB | 31 | 26 | 20 | 15 | **10** |
 
-> ⚠️ qwen2.5:14b @32K：VRAM 接近滿載，速度暴跌到 19 tok/s
-> ⚠️ ministral-3:14b @32K：VRAM 14.5GB（88.8%），速度劣化 42%
-> qwen3-vl:8b-instruct @32K：速度不掉，VRAM 僅 ~8GB，大量餘裕
+> ⚠️ qwen2.5:14b @32K：VRAM 接近滿載，速度從 79 暴跌到 19 tok/s。跟從高速公路開進泥巴地一樣。
+> ⚠️ ministral-3:14b @32K：VRAM 14.5GB（88.8%），速度劣化 42%。快到天花板了。
+> qwen3-vl:8b-instruct @32K：速度紋風不動，VRAM 僅 ~8GB，顯卡還在那邊打瞌睡。
 
-### TTFT（首 token 延遲）
+### TTFT（首 token 延遲，又名「你要等多久它才肯開口」）
 
 | 模型 | TTFT |
 |------|------|
@@ -73,15 +73,15 @@
 | gemma3:12b | ✅ | ✅ | ✅ | ✅ |
 | llama3.1:8b | ❌ | ⚠️ | ✅ | ✅ |
 
-### Context Window 甜蜜點（16GB VRAM）
+### Context Window 甜蜜點（16GB VRAM 限制下的生存指南）
 
 | 模型大小 | 建議 ctx 上限 | 理由 |
 |---------|-------------|------|
-| 8B（~6GB） | 32768-49152 | VRAM 充裕，速度不掉 |
-| 14B（~9GB） | 16384 | 32K 時 VRAM 接近滿載，速度暴跌 |
-| 24B（~15GB） | 32768 | 已是 VRAM 極限，10 tok/s 勉強可用 |
+| 8B（~6GB） | 32768-49152 | VRAM 充裕，速度不掉，日子很好過 |
+| 14B（~9GB） | 16384 | 32K 時 VRAM 接近滿載，速度會讓你開始質疑人生 |
+| 24B（~15GB） | 32768 | 已是 VRAM 極限，10 tok/s 勉強可用但需要耐心 |
 
-### Thinking vs Instruct（qwen3-vl:8b）
+### Thinking vs Instruct：一場不必要的實驗（qwen3-vl:8b）
 
 | 指標 | thinking | instruct |
 |------|----------|----------|
@@ -89,47 +89,47 @@
 | 實際回應時間 | 慢（生成 2000-17000 thinking tokens） | 快（只生成回答） |
 | 加速倍數 | — | **2x-8x**（日常任務） |
 
-> thinking 版的 tok/s 看起來差不多，但會生成大量隱藏推理 token，實際等待時間長很多。instruct 版是唯一正確選擇。
+> thinking 版的 tok/s 帳面上看起來差不多，但它會在背後偷偷生成一大堆隱藏推理 token，實際等待時間長得讓你以為它當機了。instruct 版才是正確答案，我們繞了一圈才學到這件事。
 
 ---
 
-## Part 2：OpenClaw Tool Calling 實測
+## Part 2：OpenClaw Tool Calling 實測（真正的考試來了）
 
-Benchmark 只測速度和品質，但 OpenClaw 的核心需求是 **tool calling**。以下是在完整 OpenClaw 環境（12K+ token system prompt）下的實測結果。
+Benchmark 只測速度和品質，但 OpenClaw 真正需要的是 **tool calling**——模型要能正確判斷「現在該呼叫哪個工具」。在完整 OpenClaw 環境（12K+ token system prompt）下，很多模型的表現跟 benchmark 判若兩人。
 
 ### 測試項目
 
 - **搜尋：** 透過 exec tool 呼叫 `searxng-search "關鍵字"`
 - **單燈操作：** 透過 exec tool 呼叫 `tradfri 小夜燈 開`
-- **複合操作：** 同時操作多盞燈（關餐廳 + 開客廳 + 調亮度 + 改顏色）
+- **複合操作：** 同時操作多盞燈（關餐廳 + 開客廳 + 調亮度 + 改顏色）——這是淘汰大部分模型的殺手題
 
-### 結果
+### 結果（屍橫遍野）
 
 | 模型 | 大小 | 搜尋 | 單燈 | 複合 | 結論 |
 |------|------|------|------|------|------|
 | **qwen3-vl:8b-instruct** | 6.1 GB | ✅ | ✅ | ✅ | **推薦，全通過** |
 | mistral-small3.1:24b | 15 GB | ✅ | ✅ | ✅ | 穩定但太慢（~10 tok/s @32K） |
 | qwen2.5:14b-instruct | 9.0 GB | ✅ | ⚠️ | ⚠️ | 能用但囉嗦猶豫，舊世代不如 qwen3 |
-| qwen3:4b | 2.5 GB | ✅ | ✅ | ❌ | 單指令 OK，複合崩 |
-| qwen3:4b-instruct | 2.5 GB | ❌ | ❌ | — | 完全無回應 |
-| frob/qwen3.5-instruct:9b | 6.6 GB | ❌ | ❌ | — | 不呼叫 exec |
-| gpt-oss:20b | 13 GB | ❌ | ✅/❌ | — | 極不穩定 |
-| orieg/gemma3-tools:12b-it-qat | 8.9 GB | ❌ | ❌ | — | 吐文字不呼叫 tool |
-| MFDoom/deepseek-r1-tool-calling:14b | 9.0 GB | ❌ | — | — | 吐 JSON 文字 |
-| phi4:14b | 9.1 GB | — | — | — | Ollama 不支援 tools API |
-| llama3.2-vision:11b | 7.8 GB | — | — | — | Ollama 不支援 tools API |
-| llama3.1:8b | 4.9 GB | ❌ | ❌ | — | 只回吐文字不呼叫 tool |
-| llama3.2:3b | 2.0 GB | ❌ | ❌ | — | 完全無回應 |
+| qwen3:4b | 2.5 GB | ✅ | ✅ | ❌ | 單指令 OK，複合一多就崩了 |
+| qwen3:4b-instruct | 2.5 GB | ❌ | ❌ | — | 完全無回應，像是在裝死 |
+| frob/qwen3.5-instruct:9b | 6.6 GB | ❌ | ❌ | — | 就是不呼叫 exec，你說你的它做它的 |
+| gpt-oss:20b | 13 GB | ❌ | ✅/❌ | — | 極不穩定，像在擲骰子 |
+| orieg/gemma3-tools:12b-it-qat | 8.9 GB | ❌ | ❌ | — | 只會吐文字，拒絕呼叫 tool |
+| MFDoom/deepseek-r1-tool-calling:14b | 9.0 GB | ❌ | — | — | 吐 JSON 文字當作交差 |
+| phi4:14b | 9.1 GB | — | — | — | Ollama 不支援 tools API，直接出局 |
+| llama3.2-vision:11b | 7.8 GB | — | — | — | Ollama 不支援 tools API，同上 |
+| llama3.1:8b | 4.9 GB | ❌ | ❌ | — | 只回吐文字，不知道 tool 是什麼 |
+| llama3.2:3b | 2.0 GB | ❌ | ❌ | — | 完全無回應，大概是被嚇到了 |
 
-### 為什麼大部分模型都失敗？
+### 為什麼大部分模型都陣亡了？
 
-OpenClaw 的完整 system prompt 達 **12,000+ tokens**（tool schemas + AGENTS.md + workspace files）。小模型的「注意力」被佔滿，無法正確決策呼叫哪個 tool。
+OpenClaw 的完整 system prompt 達 **12,000+ tokens**（tool schemas + AGENTS.md + workspace files）。對小模型來說，這就像塞了一本電話簿進它的腦袋——「注意力」被佔滿，根本無法正確決策要呼叫哪個 tool。
 
-**關鍵發現：** `qwen3-vl:8b-instruct` 之前也曾失敗（把 shell 指令名當 tool name），但在完善 AGENTS.md 指令後成功穩定運作。**AGENTS.md 的指令品質比模型大小更重要。**
+**最重要的發現（花了我們很多時間才領悟）：** `qwen3-vl:8b-instruct` 之前也曾失敗過——它把 shell 指令名當成 tool name 來呼叫，搞得一團亂。但在我們花時間好好寫 AGENTS.md 的指令之後，它就穩定了。**結論：AGENTS.md 的指令品質比模型大小更重要。** 與其升級顯卡，不如先把指令寫好。
 
 ---
 
-## Part 3：推理引擎比較（Ollama vs vLLM）
+## Part 3：推理引擎大亂鬥（Ollama vs vLLM）
 
 | 指標 | Ollama | vLLM |
 |------|--------|------|
@@ -140,11 +140,11 @@ OpenClaw 的完整 system prompt 達 **12,000+ tokens**（tool schemas + AGENTS.
 
 > 測試環境：Ollama + qwen3-vl:8b-instruct Q4_K_M vs vLLM + Qwen2.5-VL-7B-Instruct-AWQ，同 GPU
 
-**結論：** vLLM 的核心優勢是 continuous batching（多人併發）。單人 Telegram bot 場景下 Ollama 快 10-25 倍。vLLM 在 WSL2 + 消費級 GPU 上水土不服，不建議。
+**結論：** vLLM 的核心優勢是 continuous batching（多人併發）。如果你是開公司、服務一堆用戶，vLLM 當然好。但單人 Telegram bot 場景？Ollama 快 10-25 倍，而且 vLLM 在 WSL2 + 消費級 GPU 上簡直水土不服。我們試過了，省下你的時間。
 
 ---
 
-## 最終推薦
+## 最終推薦（講了這麼多，到底要選哪個）
 
 ### RTX 5070 Ti 16GB VRAM（實測環境）
 
@@ -154,13 +154,13 @@ OpenClaw 的完整 system prompt 達 **12,000+ tokens**（tool schemas + AGENTS.
 | 不需 vision 的備選 | `mistral-small3.1:24b` | 32768 | 10 tok/s |
 | 純聊天（不用 tool calling） | `llama3.1:8b` | 32768 | 143 tok/s |
 
-### 不推薦
+### 別碰這些（我們替你踩過了）
 
-- **gemma3 / phi4** — 不支援 Ollama tools API，無法用於 OpenClaw
-- **llama3.2-vision** — 不支援 Ollama tools API
-- **qwen3:4b** — 複合操作崩潰
-- **gpt-oss:20b** — tool calling 極不穩定
+- **gemma3 / phi4** -- 不支援 Ollama tools API，無法用於 OpenClaw，連嘗試的意義都沒有
+- **llama3.2-vision** -- 同上，不支援 Ollama tools API
+- **qwen3:4b** -- 簡單指令沒問題，複合操作直接崩潰，半桶水的存在
+- **gpt-oss:20b** -- tool calling 極不穩定，像是跟你玩俄羅斯輪盤
 
 ---
 
-*基於 RTX 5070 Ti 16GB · Ollama 0.17.7 · OpenClaw 2026.3.13 · 2026-03-19 實測*
+*基於 RTX 5070 Ti 16GB -- Ollama 0.17.7 -- OpenClaw 2026.3.13 -- 2026-03-19 實測*

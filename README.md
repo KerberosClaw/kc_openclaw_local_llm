@@ -1,18 +1,18 @@
-# OpenClaw + Local LLM: What Actually Works
+# OpenClaw + Local LLM: A Field Guide to What Actually Works (and What Absolutely Doesn't)
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 
 [正體中文](README_zh.md)
 
-Guide and tools for running [OpenClaw](https://openclaw.ai) with local LLMs via [Ollama](https://ollama.com) on consumer NVIDIA GPUs. Includes model comparison, benchmark data, setup automation, and battle-tested pitfalls.
+So you want to run [OpenClaw](https://openclaw.ai) with local LLMs via [Ollama](https://ollama.com) on a consumer NVIDIA GPU. Noble goal. We spent an unreasonable amount of time so you don't have to. This repo has model comparisons, benchmark data, setup automation, and a painfully honest record of every dumb mistake we made along the way.
 
-> Tested on RTX 5070 Ti 16GB · OpenClaw 2026.3.13 · Ollama 0.17.7
+> Tested on RTX 5070 Ti 16GB -- OpenClaw 2026.3.13 -- Ollama 0.17.7
 
 ---
 
-## Why This Repo?
+## Why Does This Repo Exist?
 
-Most "best local LLM" articles test models for **chat** — not for **agent tool calling**. OpenClaw's system prompt is 12,000+ tokens (tool schemas + workspace files), which breaks most small models. We tested 13 models and only 2 work reliably.
+Because every "best local LLM" article on the internet tests models for **chat** -- you know, "write me a poem about cats" stuff. Nobody tests for **agent tool calling**, which is the part that actually matters for OpenClaw. Its system prompt is 12,000+ tokens of tool schemas and workspace files, which turns out to be a fantastic way to make most small models completely fall apart. We tested 13 models. Only 2 survived. The other 11 died in increasingly creative ways.
 
 ## Model Comparison (RTX 5070 Ti 16GB)
 
@@ -28,9 +28,9 @@ Most "best local LLM" articles test models for **chat** — not for **agent tool
 | llama3.1:8b | 4.9 GB | ❌ | ❌ | — | Echoes text, no tool calls |
 | *+ 5 more models* | | | | | *All failed* |
 
-> **Key finding:** AGENTS.md instruction quality matters more than model size. See [setup guide](docs/setup-guide.md) for details.
+> **The thing nobody tells you:** AGENTS.md instruction quality matters more than model size. Turns out you can make an 8B model behave if you just ask nicely (and very specifically). See [setup guide](docs/setup-guide.md) for the details that took us way too long to figure out.
 
-### Inference Engine: Ollama vs vLLM
+### Inference Engine: Ollama vs vLLM (a.k.a. "We Tried Both So You Don't Have To")
 
 | Metric | Ollama | vLLM |
 |--------|--------|------|
@@ -39,7 +39,7 @@ Most "best local LLM" articles test models for **chat** — not for **agent tool
 | WSL2 support | Native | `pin_memory` limitation, major perf hit |
 | Multi-user concurrency | Sequential | PagedAttention batching (vLLM advantage) |
 
-> vLLM excels at concurrent serving. For single-user Telegram bots, Ollama wins by 10-25x.
+> vLLM is genuinely great at concurrent serving. But for a single-user Telegram bot? Ollama wins by 10-25x, and you get to keep your sanity during installation.
 
 ## Architecture
 
@@ -71,10 +71,10 @@ This project uses skills from [kc_ai_skills](https://github.com/KerberosClaw/kc_
 | [llm-benchmark](https://github.com/KerberosClaw/kc_ai_skills/tree/main/llm-benchmark) | Automated Ollama model benchmark with CPU offload detection |
 | [searxng](https://github.com/KerberosClaw/kc_ai_skills/tree/main/searxng) | OpenClaw local search integration via SearXNG |
 
-## Quick Start
+## Quick Start (for the Impatient)
 
-See the [Setup Guide](docs/setup-guide.md) for full instructions. TL;DR:
+See the [Setup Guide](docs/setup-guide.md) for the full walkthrough. But if you just want the cliff notes:
 
 1. **PC:** Install Ollama + SearXNG + pull `qwen3-vl:8b-instruct`
-2. **Mac:** Install OpenClaw + configure `openclaw.json` + write `AGENTS.md`
-3. **Test:** Search + tool calling via Telegram or Web UI
+2. **Mac:** Install OpenClaw + configure `openclaw.json` + write `AGENTS.md` (this part is more important than you think)
+3. **Test:** Search + tool calling via Telegram or Web UI, then breathe a sigh of relief when it actually works
